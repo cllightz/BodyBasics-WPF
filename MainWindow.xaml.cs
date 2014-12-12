@@ -16,6 +16,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using Microsoft.Kinect;
+    using MyCodes;
 
     /// <summary>
     /// Interaction logic for MainWindow
@@ -327,6 +328,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
 
                     int penIndex = 0;
+                    StatusText = "";
                     foreach (Body body in this.bodies)
                     {
                         Pen drawPen = this.bodyColors[penIndex++];
@@ -356,8 +358,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                             this.DrawBody(joints, jointPoints, dc, drawPen);
 
-                            this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
-                            this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc);
+                            this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc, body.TrackingId, HandLR.L);
+                            this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc, body.TrackingId, HandLR.R);
                         }
                     }
 
@@ -442,20 +444,23 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// <param name="handState">state of the hand</param>
         /// <param name="handPosition">position of the hand</param>
         /// <param name="drawingContext">drawing context to draw to</param>
-        private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext)
+        private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext, ulong ID, HandLR LR)
         {
             switch (handState)
             {
                 case HandState.Closed:
                     drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
+                    this.StatusText += String.Format("\n{3}グー({0}) = ( {1, 9:###.000}, {2, 9:###.000} )", ID, handPosition.X, handPosition.Y, LRToString(LR));
                     break;
 
                 case HandState.Open:
                     drawingContext.DrawEllipse(this.handOpenBrush, null, handPosition, HandSize, HandSize);
+                    this.StatusText += String.Format("\n{3}パー({0}) = ( {1, 9:###.000}, {2, 9:###.000} )", ID, handPosition.X, handPosition.Y, LRToString(LR));
                     break;
 
                 case HandState.Lasso:
                     drawingContext.DrawEllipse(this.handLassoBrush, null, handPosition, HandSize, HandSize);
+                    this.StatusText += String.Format("\n{3}チョキ({0}) = ( {1, 9:###.000}, {2, 9:###.000} )", ID, handPosition.X, handPosition.Y, LRToString(LR));
                     break;
             }
         }
@@ -512,6 +517,27 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             // on failure, set the status text
             this.StatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
                                                             : Properties.Resources.SensorNotAvailableStatusText;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////
+        enum HandLR
+        {
+            L, R
+        }
+
+        String LRToString( HandLR LR )
+        {
+            switch (LR)
+            {
+                case HandLR.L:
+                    return "左手";
+
+                case HandLR.R:
+                    return "右手";
+
+                default:
+                    return "";
+            }
         }
     }
 }
