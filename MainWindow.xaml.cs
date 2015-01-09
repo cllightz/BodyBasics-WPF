@@ -4,25 +4,26 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using Microsoft.Kinect;
+using MyCodes;
+
 namespace Microsoft.Samples.Kinect.BodyBasics
 {
-	using System;
-	using System.Collections.Generic;
-	using System.ComponentModel;
-	using System.Diagnostics;
-	using System.Globalization;
-	using System.IO;
-	using System.Windows;
-	using System.Windows.Media;
-	using System.Windows.Media.Imaging;
-	using Microsoft.Kinect;
-	using MyCodes;
-
 	/// <summary>
 	/// Interaction logic for MainWindow
 	/// </summary>
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
+		#region 宣言
 		/// <summary>
 		/// Radius of drawn hand circles
 		/// </summary>
@@ -127,7 +128,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 		/// Current status text to display
 		/// </summary>
 		private string statusText = null;
+		#endregion
 
+		#region 諸々のメソッド
 		/// <summary>
 		/// Initializes a new instance of the MainWindow class.
 		/// </summary>
@@ -288,6 +291,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 				this.kinectSensor = null;
 			}
 		}
+		#endregion
 
 		/// <summary>
 		/// Handles the body frame data arriving from the sensor
@@ -486,7 +490,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 															: Properties.Resources.SensorNotAvailableStatusText;
 		}
 
-		////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 		enum HandLR { L, R }
 
 		String LRToString( HandLR LR )
