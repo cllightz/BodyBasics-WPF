@@ -14,7 +14,6 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Kinect;
-using MyCodes;
 
 namespace Microsoft.Samples.Kinect.BodyBasics
 {
@@ -128,6 +127,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 		/// Current status text to display
 		/// </summary>
 		private string statusText = null;
+
+		private Janken janken;
 		#endregion
 
 		#region 諸々のメソッド
@@ -220,6 +221,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
 			// initialize the components (controls) of the window
 			this.InitializeComponent();
+
+			janken = new Janken();
 		}
 
 		/// <summary>
@@ -323,9 +326,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
 					int penIndex = 0;
 					StatusText = "";
-
+					janken.Reset();
 					ulong id = 1;
-
 
 					foreach ( Body body in this.bodies ) {
 						Pen drawPen = this.bodyColors[penIndex++];
@@ -352,12 +354,17 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
 							this.DrawBody( joints, jointPoints, dc, drawPen );
 
-							this.DrawHand( body.HandLeftState, jointPoints[JointType.HandLeft], dc, id, HandLR.L );
-							this.DrawHand( body.HandRightState, jointPoints[JointType.HandRight], dc, id, HandLR.R );
+							this.DrawHand( body.HandLeftState, jointPoints[JointType.HandLeft], dc, body.TrackingId, HandLR.L );
+							janken.Update( body.TrackingId, HandLR.L, body.HandLeftState );
 
+							this.DrawHand( body.HandRightState, jointPoints[JointType.HandRight], dc, body.TrackingId, HandLR.R );
+							janken.Update( body.TrackingId, HandLR.R, body.HandRightState );
+							
 							++id;
 						}
 					}
+
+					StatusText += "\n\n" + janken.JudgeL() + janken.JudgeR() + janken.Scores();
 
 					// prevent drawing outside of our render area
 					this.drawingGroup.ClipGeometry = new RectangleGeometry( new Rect( 0.0, 0.0, this.displayWidth, this.displayHeight ) );
@@ -434,7 +441,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 		/// <param name="drawingContext">drawing context to draw to</param>
 		private void DrawHand( HandState handState, Point handPosition, DrawingContext drawingContext, ulong ID, HandLR LR )
 		{
-			if ( HandStateAvailable( handState ) ) {
+			if ( IsHandStateAvailable( handState ) ) {
 				drawingContext.DrawEllipse( GetBrush( handState ), null, handPosition, HandSize, HandSize );
 				this.StatusText += String.Format( "\n#{0} {3}{4}\t= ( {1, 9:###.000}, {2, 9:###.000} )", ID, handPosition.X, handPosition.Y, LRToString( LR ), HandStateToString( handState ) );
 			}
@@ -492,9 +499,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		enum HandLR { L, R }
-
-		String LRToString( HandLR LR )
+		public static String LRToString( HandLR LR )
 		{
 			switch ( LR ) {
 				case HandLR.L:
@@ -508,7 +513,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 			}
 		}
 
-		String HandStateToString( HandState HS )
+		public static String HandStateToString( HandState HS )
 		{
 			switch ( HS ) {
 				case HandState.Closed:
@@ -525,12 +530,12 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 			}
 		}
 
-		bool HandStateAvailable( HandState HS )
+		public static bool IsHandStateAvailable( HandState HS )
 		{
 			return HS != HandState.NotTracked && HS != HandState.Unknown;
 		}
 
-		Brush GetBrush( HandState HS )
+		private Brush GetBrush( HandState HS )
 		{
 			switch ( HS ) {
 				case HandState.Closed:

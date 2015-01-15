@@ -26,7 +26,7 @@
     </Viewbox>
       
     <StatusBar Grid.Row="10" HorizontalAlignment="Stretch" Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
-      <StatusBarItem Content="{Binding StatusText}" Height="100" />
+      <StatusBarItem Content="{Binding StatusText}" Height="400" />
     </StatusBar>
   </Grid>
 </Window>

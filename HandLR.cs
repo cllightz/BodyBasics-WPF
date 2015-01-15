@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyCodes
+namespace Microsoft.Samples.Kinect.BodyBasics
 {
+	public enum HandLR { L, R }
 }
