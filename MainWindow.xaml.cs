@@ -354,17 +354,15 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
 							this.DrawBody( joints, jointPoints, dc, drawPen );
 
+							janken.Update( body );
 							this.DrawHand( body.HandLeftState, jointPoints[JointType.HandLeft], dc, body.TrackingId, HandLR.L );
-							janken.Update( body.TrackingId, HandLR.L, body.HandLeftState );
-
 							this.DrawHand( body.HandRightState, jointPoints[JointType.HandRight], dc, body.TrackingId, HandLR.R );
-							janken.Update( body.TrackingId, HandLR.R, body.HandRightState );
 							
 							++id;
 						}
 					}
 
-					StatusText += "\n\n" + janken.JudgeL() + janken.JudgeR() + janken.Scores();
+					StatusText += janken.JudgeL() + janken.JudgeR() + janken.Scores();
 
 					// prevent drawing outside of our render area
 					this.drawingGroup.ClipGeometry = new RectangleGeometry( new Rect( 0.0, 0.0, this.displayWidth, this.displayHeight ) );
@@ -443,7 +441,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 		{
 			if ( IsHandStateAvailable( handState ) ) {
 				drawingContext.DrawEllipse( GetBrush( handState ), null, handPosition, HandSize, HandSize );
-				this.StatusText += String.Format( "\n#{0} {3}{4}\t= ( {1, 9:###.000}, {2, 9:###.000} )", ID, handPosition.X, handPosition.Y, LRToString( LR ), HandStateToString( handState ) );
+				//this.StatusText += String.Format( "\n#{0} {3}{4}\t= ( {1, 9:###.000}, {2, 9:###.000} )", ID, handPosition.X, handPosition.Y, LRToString( LR ), HandStateToString( handState ) );
 			}
 		}
 

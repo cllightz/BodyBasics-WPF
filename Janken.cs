@@ -29,16 +29,16 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 			CurrentPlayers.Clear();
 		}
 
-		public void Update( ulong ID, HandLR LR, HandState HS )
+		public void Update( Body body )
 		{
-			CurrentPlayers.Add( ID );
+			CurrentPlayers.Add( body.TrackingId );
 
-			if ( players.ContainsKey( ID ) ) {
-				players[ID].hands.Update( LR, new Hand( HS ) );
-			} else {
-				players.Add( ID, new Player() );
-				players[ID].hands.Update( LR, new Hand( HS ) );
+			if ( ! players.ContainsKey( body.TrackingId ) ) {
+				players.Add( body.TrackingId, new Player() );
 			}
+
+			players[body.TrackingId].hands.Update( HandLR.L, new Hand( body.HandLeftState ) );
+			players[body.TrackingId].hands.Update( HandLR.R, new Hand( body.HandRightState ) );
 		}
 
 		public string JudgeL()
@@ -77,10 +77,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 					if ( player.isAvailL ) {
 						if ( player.hands.L.HS == winner ) {
 							player.score += +20;
-							res += String.Format( "プレイヤー{0}\t○:{1}\n", i, player.textL );
+							res += String.Format( "プレイヤー{0,-2} ○:{1}\t", i, player.textL );
 						} else {
 							player.score += -10;
-							res += String.Format( "プレイヤー{0}\t×:{1}\n", i, player.textL );
+							res += String.Format( "プレイヤー{0,-2} ×:{1}\t", i, player.textL );
 						}
 					} else {
 						res += String.Format( "プレイヤー{0}\t無効\n", i );
@@ -95,9 +95,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 					var player = players[id];
 
 					if ( player.isAvailL ) {
-						res += String.Format( "プレイヤー{0}\t△:{1}\n", i, player.textL );
+						res += String.Format( "プレイヤー{0,-2} △:{1}\t", i, player.textL );
 					} else {
-						res += String.Format( "プレイヤー{0}\t無効\n", i );
+						res += String.Format( "プレイヤー{0,-2} 無効\t", i );
 						player.score += -1;
 					}
 
@@ -145,13 +145,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 					if ( player.isAvailR ) {
 						if ( player.hands.R.HS == winner ) {
 							player.score += +20;
-							res += String.Format( "プレイヤー{0}\t○:{1}\n", i, player.textR );
+							res += String.Format( "プレイヤー{0,-2} ○:{1}\t", i, player.textR );
 						} else {
 							player.score += -10;
-							res += String.Format( "プレイヤー{0}\t×:{1}\n", i, player.textR );
+							res += String.Format( "プレイヤー{0,-2} ×:{1}\t", i, player.textR );
 						}
 					} else {
-						res += String.Format( "プレイヤー{0}\t無効\n", i );
+						res += String.Format( "プレイヤー{0,-2} 無効\t\t", i );
 						player.score += -1;
 					}
 
@@ -164,9 +164,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 					var player = players[id];
 
 					if ( player.isAvailR ) {
-						res += String.Format( "プレイヤー{0}\t△:{1}\n", i, player.textR );
+						res += String.Format( "プレイヤー{0,-2} △:{1}\t", i, player.textR );
 					} else {
-						res += String.Format( "プレイヤー{0}\t無効\n", i );
+						res += String.Format( "プレイヤー{0,-2} 無効\t\t", i );
 						player.score += -1;
 					}
 
@@ -201,7 +201,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 			ulong i = 1;
 
 			foreach ( var id in CurrentPlayers ) {
-				res += String.Format( "プレイヤー{0}\t{1,8}点\n", i, players[id].score );
+				res += String.Format( "プレイヤー{0} {1,8}点\t", i, players[id].score );
 				++i;
 			}
 
